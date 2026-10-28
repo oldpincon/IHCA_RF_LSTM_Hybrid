@@ -69,3 +69,20 @@ H2 要重跑 v4G 才拿得到內層預測，需要數小時以上，H1 跑完後
 ## 輸出
 - `hybrid_avg.py` → `results_hybrid_<analysis>_oof.csv`、`results_hybrid_summary.csv`
 - `delong_hybrid.py` → `results_delong_hybrid.csv`
+
+## H1 結果（2026-10-29，3 個 repeat 的 pooled AUC 平均）
+| 分析 | RF | LR | v4G | Hybrid_RF_v4G | Hybrid_RF_LR | Hybrid_RF_v4G_prob |
+|---|---|---|---|---|---|---|
+| primary | 0.881 | 0.866 | 0.826 | 0.884 | 0.897 | 0.867 |
+| no_labs | 0.866 | 0.819 | 0.858 | 0.888 | 0.878 | 0.863 |
+| min10 | 0.875 | 0.905 | 0.812 | 0.887 | 0.903 | 0.860 |
+
+- 顯著進步：沒有。Hybrid_RF_v4G vs RF 的 9 組比較在 Holm 校正後都不顯著（差 −0.028 到 +0.038）。
+- 數值上一致較高：**不符合**。Hybrid_RF_v4G 在三個分析都略高於 RF，但只有 no_labs 高於 Hybrid_RF_LR；
+  primary 與 min10 都是 Hybrid_RF_LR 比較高。
+- 36 組中唯一 Holm 校正後顯著的：min10 repeat 1，Hybrid_RF_v4G 高於 v4G（+0.060，p_holm = 0.022）。
+- 解讀：hybrid 比 RF 略高，主要來自「平均兩個模型」本身，換成 LR 也一樣甚至更好；
+  只有在不用檢驗值時（v4G 本身最接近 RF），LSTM 才提供了 LR 沒有的資訊。
+- 敏感度分析：直接平均機率（Hybrid_RF_v4G_prob）在三個分析都比排名平均低，也比 RF 低，
+  與事先的判斷一致（v4G 的機率範圍較大，會主導平均）。
+- H2：尚未決定是否執行。
